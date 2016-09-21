@@ -121,6 +121,17 @@ if (isset($preferences['host_name_search']) && $preferences['host_name_search'] 
     $query .= " AND h.host_id IN ($preferences[host_name_search])";
 }
 
+if (isset($preferences['host_group_filter']) && $preferences['host_group_filter']) {
+    $query = CentreonUtils::conditionBuilder($query, " h.host_id IN
+    												   (SELECT host_host_id
+    												   FROM ".$conf_centreon['db'].".hostgroup_relation
+    												   WHERE hostgroup_hg_id = ".$dbb->escape($preferences['host_group_filter']).") ");
+}
+
+if (isset($preferences['poller_filter']) && $preferences['poller_filter']) {
+    $query = CentreonUtils::conditionBuilder($query, " instance_id IN (".$preferences['poller_filter'].") ");
+}
+
 $stateTab = array();
 if (isset($preferences['host_up']) && $preferences['host_up']) {
     $stateTab[] = 0;
@@ -150,11 +161,6 @@ if (isset($preferences['downtime_filter']) && $preferences['downtime_filter']) {
     }
 }
 
-if (isset($preferences['poller_filter']) && $preferences['poller_filter']) {
-
-        $query = CentreonUtils::conditionBuilder($query, " instance_id = ".$preferences['poller_filter']." ");
-}
-
 if (isset($preferences['state_type_filter']) && $preferences['state_type_filter']) {
     if ($preferences['state_type_filter'] == "hardonly") {
         $query = CentreonUtils::conditionBuilder($query, " state_type = 1 ");
@@ -163,12 +169,6 @@ if (isset($preferences['state_type_filter']) && $preferences['state_type_filter'
     }
 }
 
-if (isset($preferences['hostgroup']) && $preferences['hostgroup']) {
-    $query = CentreonUtils::conditionBuilder($query, " h.host_id IN
-    												   (SELECT host_host_id
-    												   FROM ".$conf_centreon['db'].".hostgroup_relation
-    												   WHERE hostgroup_hg_id = ".$dbb->escape($preferences['hostgroup']).") ");
-}
 if (isset($preferences["display_severities"]) && $preferences["display_severities"]
     && isset($preferences['criticality_filter']) && $preferences['criticality_filter'] != "") {
   $tab = split(",", $preferences['criticality_filter']);
@@ -256,6 +256,8 @@ while ($row = $res->fetchRow()) {
             $data[$row['host_id']]['comment'] = '-';
         }
     }
+
+    /* Get index_data */
 
     $data[$row['host_id']]['encoded_host_name'] = urlencode($data[$row['host_id']]['host_name']);
 
