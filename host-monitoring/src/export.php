@@ -103,7 +103,7 @@ $query = "SELECT SQL_CALC_FOUND_ROWS h.host_id,
 				 action_url,
 				 notes_url, 
                  cv.value AS criticality,
-		 cv2.value AS criticality_id,
+		         cv2.value AS criticality_id,
                  cv.name IS NULL as isnull ";
 $query .= "FROM hosts h ";
 $query .= " LEFT JOIN `customvariables` cv ";
