@@ -102,7 +102,6 @@ var sid = '<?php echo session_id();?>';
 
 $(function() {
 	$(".toolbar").html(actions);
-
 	$(".toolbar").change(function() {
 		if (jQuery(this).val() != 0) {
     		var checkValues = $("input:checked").map(function() {

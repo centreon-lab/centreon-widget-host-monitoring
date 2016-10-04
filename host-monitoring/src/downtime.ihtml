@@ -65,7 +65,7 @@
 	<div id="validForm">
 		<input class="btc bt_info" type='hidden' name='hosts' value='{$hosts}' />
 		<input class="btc bt_info" type='hidden' name='cmdType' value='downtime' />
-		<input class="btc bt_info" type='button' id='submit' value='{$submitLabel}'/>
+		<input class="btc bt_success" type='button' id='submit' value='{$submitLabel}'/>
 	</div>
 </form>
 
