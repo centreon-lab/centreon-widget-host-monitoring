@@ -42,10 +42,9 @@ require_once $centreon_path . 'www/class/centreonHost.class.php';
 require_once $centreon_path . 'www/class/centreonService.class.php';
 require_once $centreon_path . 'www/class/centreonExternalCommand.class.php';
 require_once $centreon_path . 'www/class/centreonUtils.class.php';
+require_once $centreon_path . 'www/widgets/host-monitoring/class/centreonWidgetHostMonitoringExternalCommand.class.php';
 
 session_start();
-
-var_dump($_POST);
 
 try {
     if (!isset($_SESSION['centreon']) || !isset($_POST['cmdType']) || !isset($_POST['hosts']) ||
@@ -66,6 +65,8 @@ try {
     $command = "";
     $author = $_POST['author'];
     $comment = "";
+    $widgetExternalCommand = new centreonWidgetHostMonitoringExternalCommand($db);
+    $commands = array();
 
     if (isset($_POST['comment'])) {
         $comment = $_POST['comment'];
@@ -94,6 +95,7 @@ try {
         if (isset($_POST['fixed'])) {
             $fixed = 1;
         }
+
         $duration = 0;
         if (isset($_POST['dayduration'])) {
             $duration += ($_POST['dayduration'] * 86400);
@@ -110,54 +112,50 @@ try {
         }
 
         if (isset($_POST['start_time']) && $_POST['start_time']) {
-            $tab = explode(':', $_POST['start_time']);
-            $tmpHstart = trim($tab[0]);
-            $tmpMstart = trim($tab[1]);
+            $timeStart = str_replace(' ', '', $_POST['start_time']);
         } else {
-            $tmpHstart = "00";
-            $tmpMstart = "00";
+            $timeStart = '00:00';
         }
 
         if (isset($_POST['end_time']) && $_POST['end_time']) {
-            $tab = explode(':', $_POST['end_time']);
-            $tmpHend = trim($tab[0]);
-            $tmpMend = trim($tab[1]);
+            $timeEnd = str_replace(' ', '', $_POST['end_time']);
         } else {
-            $tmpHend = "00";
-            $tmpMend = "00";
+            $timeEnd = '00:00';
         }
 
         $dateStart = $_POST['start'];
-        $start = $dateStart . " " . $tmpHstart . ":" . $tmpMstart;
-        $start = CentreonUtils::getDateTimeTimestamp($start);
         $dateEnd = $_POST['end'];
-        $end = $dateEnd . " " . $tmpHend . ":" . $tmpMend;
-        $end = CentreonUtils::getDateTimeTimestamp($end);
-        $command = "SCHEDULE_HOST_DOWNTIME;%s;$start;$end;$fixed;0;$duration;$author;$comment";
-        $commandSvc = "SCHEDULE_SVC_DOWNTIME;%s;%s;$start;$end;$fixed;0;$duration;$author;$comment";
-    } else {
-        throw new Exception('Unknown command');
-    }
-    if ($command != "") {
+
+        /*
+
+         */
+
         foreach ($hosts as $hostId) {
             $hostname = $hostObj->getHostName($hostId);
             $pollerId = $hostObj->getHostPollerId($hostId);
-            $externalCmd->setProcessCommand(sprintf($command, $hostname), $pollerId);
-            if (isset($forceCmd)) {
-                $externalCmd->setProcessCommand(sprintf($forceCmd, $hostname), $pollerId);
-            }
+
+            $timestampStart = $widgetExternalCommand->getTimestamp($hostId, $dateStart, $timeStart);
+
+            $timestampEnd = $widgetExternalCommand->getTimestamp($hostId, $dateEnd, $timeEnd);
+
+            $commands[$pollerId][] = "SCHEDULE_HOST_DOWNTIME;$hostname;$timestampStart;$timestampEnd;$fixed;0;$duration;$author;$comment";
+
             if (isset($_POST['processServices'])) {
-                $services = $svcObj->getServiceId(null, $hostname);
-                foreach($services as $svcDesc => $svcId) {
-                    $externalCmd->setProcessCommand(sprintf($commandSvc, $hostname, $svcDesc), $pollerId);
-                    if (isset($forceCmdSvc)) {
-                        $externalCmd->setProcessCommand(sprintf($forceCmdSvc, $hostname, $svcDesc), $pollerId);
-                    }
-                }
+                $commands[$pollerId][] = "SCHEDULE_HOST_SVC_DOWNTIME;$hostname;$timestampStart;$timestampEnd;$fixed;0;$duration;$author;$comment";
             }
         }
-        $externalCmd->write();
+
+    } else {
+        throw new Exception('Unknown command');
     }
+
+    foreach ($commands as $pollerId => $commandLines) {
+        foreach ($commandLines as $commandLine) {
+            $externalCmd->setProcessCommand($commandLine, $pollerId);
+        }
+    }
+    $externalCmd->write();
+
 } catch (Exception $e) {
     echo $e->getMessage();
 }
