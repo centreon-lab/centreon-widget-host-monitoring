@@ -18,7 +18,7 @@
 			<td class="FormRowField">{$endLabel}<span style='color: red;'> *</span></td>
 			<td class="FormRowValue">
 				<input class="datepicker hasDatepicker" type='text' id='downtimeend' name='end' value='{$defaultEnd}' size='9' />
-				<input id="end_time" size="5" class="timepicker hasTimepicker" name="start_time" type="text" value='{$defaultHourEnd} : {$defaultMinuteEnd}'>
+				<input id="end_time" size="5" class="timepicker hasTimepicker" name="end_time" type="text" value='{$defaultHourEnd} : {$defaultMinuteEnd}'>
 			</td>
 		</tr>
 

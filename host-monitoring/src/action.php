@@ -190,10 +190,6 @@ try {
 }
 ?>
 <div id='result'></div>
-<!---->
-<!--<script type="text/javascript" src="./include/common/javascript/jquery/jquery.js"></script>-->
-<!--<script type="text/javascript" src="./include/common/javascript/jquery/jquery-ui.js"></script>-->
-<!--<script type="text/javascript" src="./include/common/javascript/widgetUtils.js"></script>-->
 
 <script type='text/javascript'>
 var result = <?php echo $result;?>;
@@ -229,7 +225,7 @@ function sendCmd()
     jQuery.ajax({
 				type	:	"POST",
 				url		:   "./widgets/host-monitoring/src/sendCmd.php",
-				data	: 	jQuery("#Form").serialize(),
+				data	: 	jQuery("#select_form").serialize(),
 				success	:	function() {
                             jQuery("#result").html(successMsg);
 								setTimeout('closeBox()', 2000);
