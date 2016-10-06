@@ -1,7 +1,7 @@
 <link href="./Themes/Centreon-2/jquery-ui/jquery-ui.css" rel="stylesheet" type="text/css"/>
 <link href="./Themes/Centreon-2/style.css" rel="stylesheet" type="text/css"/>
 
-<form id='Form'>
+<form id='select_form'>
 	<div class="colorbox-popin">
 		<table class="table" style="font-size: 11px;">
 			<tr>
@@ -39,8 +39,8 @@
 			</tr>
 		</table>
 		<div id="validForm">
-			<input type='hidden' name='hosts' value='{$hosts}' />
-			<input type='hidden' name='cmdType' value='ack' />
+			<input class="btc bt_info" type='hidden' name='hosts' value='{$hosts}' />
+			<input class="btc bt_info" type='hidden' name='cmdType' value='ack' />
 			<input type='button' id='submit' class="btc bt_success" value='{$submitLabel}'/>
 		</div>
 	</div>
