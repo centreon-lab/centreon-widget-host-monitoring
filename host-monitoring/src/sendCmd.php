@@ -47,6 +47,7 @@ require_once $centreon_path . 'www/widgets/host-monitoring/class/centreonWidgetH
 session_start();
 
 try {
+    var_dump($_SESSION['cmdType']);
     if (!isset($_SESSION['centreon']) || !isset($_POST['cmdType']) || !isset($_POST['hosts']) ||
         !isset($_POST['author'])) {
         throw new Exception('Missing data');
@@ -71,6 +72,7 @@ try {
     if (isset($_POST['comment'])) {
         $comment = $_POST['comment'];
     }
+
     if ($type == 'ack') {
         $persistent = 0;
         $sticky = 0;
@@ -84,12 +86,20 @@ try {
         if (isset($_POST['notify'])) {
             $notify = 1;
         }
-        $command = "ACKNOWLEDGE_HOST_PROBLEM;%s;$sticky;$notify;$persistent;$author;$comment";
-        $commandSvc = "ACKNOWLEDGE_SVC_PROBLEM;%s;%s;$sticky;$notify;$persistent;$author;$comment";
-        if (isset($_POST['forcecheck'])) {
-            $forceCmd = "SCHEDULE_FORCED_HOST_CHECK;%s;".time();
-            $forceCmdSvc = "SCHEDULE_FORCED_SVC_CHECK;%s;%s;".time();
+
+        foreach ($hosts as $hostId) {
+            $hostname = $hostObj->getHostName($hostId);
+            $pollerId = $hostObj->getHostPollerId($hostId);
+
+            $commands[$pollerId][] = "ACKNOWLEDGE_HOST_PROBLEM;$hostname;$sticky;$notify;$persistent;$author;$comment";
+            $commands[$pollerId][] = "ACKNOWLEDGE_HOST_SVC_PROBLEM;$hostname;$sticky;$notify;$persistent;$author;$comment";
+
+            if (isset($_POST['forcecheck'])) {
+                $commands[$pollerId][] = "SCHEDULE_FORCED_HOST_CHECK;$hostname;".time();
+                $commands[$pollerId][] = "SCHEDULE_FORCED_HOST_SVC_CHECK;$hostname;".time();
+            }
         }
+
     } elseif ($type == 'downtime') {
         $fixed = 0;
         if (isset($_POST['fixed'])) {

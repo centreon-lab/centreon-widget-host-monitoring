@@ -1,5 +1,5 @@
-<link href="../../../Themes/Centreon-2/jquery-ui/jquery-ui.css" rel="stylesheet" type="text/css"/>
-<link href="../../../Themes/Centreon-2/style.css" rel="stylesheet" type="text/css"/>
+<link href="./Themes/Centreon-2/jquery-ui/jquery-ui.css" rel="stylesheet" type="text/css"/>
+<link href="./Themes/Centreon-2/style.css" rel="stylesheet" type="text/css"/>
 
 <form id='Form'>
 	<div class="colorbox-popin">
@@ -24,8 +24,10 @@
 				<td class="FormRowValue"><input type='text' value='{$author}' disabled /><input name='author' type='hidden' value='{$author}'/></td>
 			</tr>
 			<tr>
-				<td class="FormRowField">{$commentLabel}<span style='color: red;'>*</span></td>
-				<td class="FormRowValue"><textarea id='popupComment' name='comment' cols='30' rows='3'>{$defaultMessage}</textarea></td>
+				<td class="FormRowField">{$commentLabel}<span style='color: red;'> *</span></td>
+				<td class="FormRowValue">
+					<textarea id='popupComment' name='comment' cols='30' rows='3'>{$defaultMessage}</textarea>
+				</td>
 			</tr>
 			<tr>
 				<td class="FormRowField">{$ackHostSvcLabel}</td>
