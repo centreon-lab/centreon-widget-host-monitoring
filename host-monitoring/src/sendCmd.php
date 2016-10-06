@@ -100,9 +100,11 @@ try {
         if (isset($_POST['dayduration'])) {
             $duration += ($_POST['dayduration'] * 86400);
         }
+
         if (isset($_POST['hourduration'])) {
             $duration += ($_POST['hourduration'] * 3600);
         }
+
         if (isset($_POST['minuteduration'])) {
             $duration += ($_POST['minuteduration'] * 60);
         }
@@ -125,10 +127,6 @@ try {
 
         $dateStart = $_POST['start'];
         $dateEnd = $_POST['end'];
-
-        /*
-
-         */
 
         foreach ($hosts as $hostId) {
             $hostname = $hostObj->getHostName($hostId);

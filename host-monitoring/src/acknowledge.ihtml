@@ -25,7 +25,7 @@
 			</tr>
 			<tr>
 				<td class="FormRowField">{$commentLabel}<span style='color: red;'>*</span></td>
-				<td class="FormRowValue"><textarea id='comment' name='comment' cols='30' rows='3'>{$defaultMessage}</textarea></td>
+				<td class="FormRowValue"><textarea id='popupComment' name='comment' cols='30' rows='3'>{$defaultMessage}</textarea></td>
 			</tr>
 			<tr>
 				<td class="FormRowField">{$ackHostSvcLabel}</td>
