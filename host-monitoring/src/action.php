@@ -179,7 +179,7 @@ try {
         }
         if ($command != "") {
             foreach ($hosts as $hostId) {
-                $externalCmd->setrocessCommand(sprintf($command, $hostObj->getHostName($hostId)), $hostObj->getHostPollerId($hostId));
+                $externalCmd->setProcessCommand(sprintf($command, $hostObj->getHostName($hostId)), $hostObj->getHostPollerId($hostId));
             }
             $externalCmd->write();
         }
