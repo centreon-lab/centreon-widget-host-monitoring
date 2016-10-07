@@ -155,6 +155,7 @@ try {
         switch ($cmd) {
                 /* remove ack */
                 case 73 :
+                    echo 'toto';
                     $command = "REMOVE_HOST_ACKNOWLEDGEMENT;%s";
                     break;
                 /* enable notif */
@@ -179,7 +180,7 @@ try {
         }
         if ($command != "") {
             foreach ($hosts as $hostId) {
-                $externalCmd->setrocessCommand(sprintf($command, $hostObj->getHostName($hostId)), $hostObj->getHostPollerId($hostId));
+                $externalCmd->setProcessCommand(sprintf($command, $hostObj->getHostName($hostId)), $hostObj->getHostPollerId($hostId));
             }
             $externalCmd->write();
         }
