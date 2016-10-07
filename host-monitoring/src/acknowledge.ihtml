@@ -1,5 +1,5 @@
-<link href="./Themes/Centreon-2/jquery-ui/jquery-ui.css" rel="stylesheet" type="text/css"/>
-<link href="./Themes/Centreon-2/style.css" rel="stylesheet" type="text/css"/>
+<link href="../../../Themes/Centreon-2/jquery-ui/jquery-ui.css" rel="stylesheet" type="text/css"/>
+<link href="../../../Themes/Centreon-2/style.css" rel="stylesheet" type="text/css"/>
 
 <form id='select_form'>
 	<div class="colorbox-popin">
@@ -45,4 +45,3 @@
 		</div>
 	</div>
 </form>
-

@@ -28,5 +28,4 @@ class centreonWidgetHostMonitoringExternalCommand
 
         return $timestamp;
     }
-
 }

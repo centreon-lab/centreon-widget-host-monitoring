@@ -141,9 +141,18 @@ try {
             $hostname = $hostObj->getHostName($hostId);
             $pollerId = $hostObj->getHostPollerId($hostId);
 
-            $timestampStart = $widgetExternalCommand->getTimestamp($hostId, $dateStart, $timeStart);
+            /*
+             TODO Add checkbox to use host timezone
 
-            $timestampEnd = $widgetExternalCommand->getTimestamp($hostId, $dateEnd, $timeEnd);
+
+              $timestampStart = $widgetExternalCommand->getTimestamp($hostId, $dateStart, $timeStart);
+
+              $timestampEnd = $widgetExternalCommand->getTimestamp($hostId, $dateEnd, $timeEnd);
+
+            */
+
+            $timestampStart = CentreonUtils::getDateTimeTimestamp($dateStart . " " . $timeStart);
+            $timestampEnd = CentreonUtils::getDateTimeTimestamp($dateEnd . " " . $timeEnd);
 
             $commands[$pollerId][] = "SCHEDULE_HOST_DOWNTIME;$hostname;$timestampStart;$timestampEnd;$fixed;0;$duration;$author;$comment";
 
