@@ -125,7 +125,7 @@ if (isset($preferences['host_group_filter']) && $preferences['host_group_filter'
     $query = CentreonUtils::conditionBuilder($query, " h.host_id IN
     												   (SELECT host_host_id
     												   FROM ".$conf_centreon['db'].".hostgroup_relation
-    												   WHERE hostgroup_hg_id = ".$dbb->escape($preferences['host_group_filter']).") ");
+    												   WHERE hostgroup_hg_id IN ( ".$dbb->escape($preferences['host_group_filter'])." )) ");
 }
 
 if (isset($preferences['poller_filter']) && $preferences['poller_filter']) {
