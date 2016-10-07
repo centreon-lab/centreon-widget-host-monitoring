@@ -91,11 +91,11 @@ try {
             $pollerId = $hostObj->getHostPollerId($hostId);
 
             $commands[$pollerId][] = "ACKNOWLEDGE_HOST_PROBLEM;$hostname;$sticky;$notify;$persistent;$author;$comment";
-            $commands[$pollerId][] = "ACKNOWLEDGE_HOST_SVC_PROBLEM;$hostname;$sticky;$notify;$persistent;$author;$comment";
+            $commands[$pollerId][] = "ACKNOWLEDGE_SVC_PROBLEM;$hostname;$sticky;$notify;$persistent;$author;$comment";
 
             if (isset($_POST['forcecheck'])) {
                 $commands[$pollerId][] = "SCHEDULE_FORCED_HOST_CHECK;$hostname;".time();
-                $commands[$pollerId][] = "SCHEDULE_FORCED_HOST_SVC_CHECK;$hostname;".time();
+                $commands[$pollerId][] = "SCHEDULE_FORCED_SVC_CHECK;$hostname;".time();
             }
         }
 

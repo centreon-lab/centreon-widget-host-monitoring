@@ -155,7 +155,6 @@ try {
         switch ($cmd) {
                 /* remove ack */
                 case 73 :
-                    echo 'toto';
                     $command = "REMOVE_HOST_ACKNOWLEDGEMENT;%s";
                     break;
                 /* enable notif */
