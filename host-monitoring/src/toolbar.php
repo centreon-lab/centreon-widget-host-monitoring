@@ -70,7 +70,7 @@ if ($canDoAction || $centreon->user->access->checkAction("host_acknowledgement")
     $actions .= "<option value='72'>"._("Acknowledge")."</option>";
 }
 if ($canDoAction || $centreon->user->access->checkAction("host_acknowledgement")) {
-    $actions .= "<option value='73'>"._("Remove Acknowledgement")."</option>";
+    $actions .= "<option value='73'>"._("Disacknowledge")."</option>";
 }
 if ($canDoAction || $centreon->user->access->checkAction("host_schedule_downtime")) {
     $actions .= "<option value='75'>"._("Set Downtime")."</option>";
