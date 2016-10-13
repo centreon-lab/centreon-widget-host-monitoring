@@ -42,11 +42,16 @@ require_once $centreon_path . 'www/class/centreonHost.class.php';
 require_once $centreon_path . 'www/class/centreonService.class.php';
 require_once $centreon_path . 'www/class/centreonExternalCommand.class.php';
 require_once $centreon_path . 'www/class/centreonUtils.class.php';
+require_once $centreon_path . 'www/class/centreonGMT.class.php';
+
+//             TODO Add checkbox to use host timezone
 require_once $centreon_path . 'www/widgets/host-monitoring/class/centreonWidgetHostMonitoringExternalCommand.class.php';
+//
 
 session_start();
 
 try {
+    var_dump($_POST['cmdType']);
     if (!isset($_SESSION['centreon']) || !isset($_POST['cmdType']) || !isset($_POST['hosts']) ||
         !isset($_POST['author'])) {
         throw new Exception('Missing data');
@@ -67,6 +72,16 @@ try {
     $comment = "";
     $widgetExternalCommand = new centreonWidgetHostMonitoringExternalCommand($db);
     $commands = array();
+    $centreonGMT = new CentreonGMT($db);
+    $centreonGMT->getMyGMTFromSession(session_id(), $db);
+    $locationId = $centreonGMT->getMyGMT();
+
+    $location = $centreonGMT->getMyTimezone();
+    if (!is_null($location)) {
+        $dateTime = new DateTime('now', new DateTimeZone($location));
+    } else {
+        $dateTime = new DateTime('now');
+    }
 
     if (isset($_POST['comment'])) {
         $comment = $_POST['comment'];
@@ -122,11 +137,22 @@ try {
             throw new Exception ('Missing downtime start/end');
         }
 
+        $dateStart = $_POST['start'];
+        $dateEnd = $_POST['end'];
+
         if (isset($_POST['start_time']) && $_POST['start_time']) {
             $timeStart = str_replace(' ', '', $_POST['start_time']);
+
         } else {
             $timeStart = '00:00';
         }
+
+        list($hour, $minute) = explode(':', $timeStart);
+        $dateTime->setTime($hour, $minute);
+        list($year, $month, $day) = explode('/', $dateStart);
+        $dateTime->setDate($year, $month, $day);
+        $timestampStart = $dateTime->getTimestamp();
+        var_dump($timestampStart);
 
         if (isset($_POST['end_time']) && $_POST['end_time']) {
             $timeEnd = str_replace(' ', '', $_POST['end_time']);
@@ -134,8 +160,11 @@ try {
             $timeEnd = '00:00';
         }
 
-        $dateStart = $_POST['start'];
-        $dateEnd = $_POST['end'];
+        list($hour, $minute) = explode(':', $timeEnd);
+        $dateTime->setTime($hour, $minute);
+        list($year, $month, $day) = explode('/', $dateEnd);
+        $dateTime->setDate($year, $month, $day);
+        $timestampEnd = $dateTime->getTimestamp();
 
         foreach ($hosts as $hostId) {
             $hostname = $hostObj->getHostName($hostId);
@@ -144,15 +173,10 @@ try {
             /*
              TODO Add checkbox to use host timezone
 
-
               $timestampStart = $widgetExternalCommand->getTimestamp($hostId, $dateStart, $timeStart);
 
               $timestampEnd = $widgetExternalCommand->getTimestamp($hostId, $dateEnd, $timeEnd);
-
             */
-
-            $timestampStart = CentreonUtils::getDateTimeTimestamp($dateStart . " " . $timeStart);
-            $timestampEnd = CentreonUtils::getDateTimeTimestamp($dateEnd . " " . $timeEnd);
 
             $commands[$pollerId][] = "SCHEDULE_HOST_DOWNTIME;$hostname;$timestampStart;$timestampEnd;$fixed;0;$duration;$author;$comment";
 

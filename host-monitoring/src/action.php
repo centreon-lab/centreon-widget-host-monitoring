@@ -42,6 +42,7 @@ require_once $centreon_path . 'www/class/centreonUtils.class.php';
 require_once $centreon_path . 'www/class/centreonACL.class.php';
 require_once $centreon_path . 'www/class/centreonHost.class.php';
 require_once $centreon_path . 'www/class/centreonExternalCommand.class.php';
+require_once $centreon_path . 'www/class/centreonGMT.class.php';
 
 session_start();
 
@@ -58,6 +59,25 @@ try {
     $cmd = $_REQUEST['cmd'];
     $hosts = explode(",", $_REQUEST['selection']);
     $externalCmd = new CentreonExternalCommand($centreon);
+
+//    Récupère la Timezone de l'utilisateur
+
+    $centreonGMT = new CentreonGMT($db);
+    $centreonGMT->getMyGMTFromSession(session_id(), $db);
+    $locationId = $centreonGMT->getMyGMT();
+    $location = $centreonGMT->getMyTimezone();
+    if (!is_null($location)) {
+        $dateTime = new DateTime('now', new DateTimeZone($location));
+    } else {
+        $dateTime = new DateTime('now');
+    }
+
+    $hourStart = $dateTime->format('H');
+    $minStart = $dateTime->format('i');
+
+    $dateStart = $dateTime->format('Y/m/d');
+    $dateEnd = $dateTime->format('Y/m/d');
+
 
     $hostObj = new CentreonHost($db);
     $successMsg = _("External Command successfully submitted... Exiting window...");
@@ -119,6 +139,7 @@ try {
 
             $template->display('acknowledge.ihtml');
         } elseif ($cmd == 75) {
+
             $template->assign('downtimeHostSvcLabel', _("Set downtime on services of hosts"));
             $template->assign('defaultMessage', sprintf(_('Downtime set by %s'), $centreon->user->alias));
             $template->assign('titleLabel', _("Host Downtime"));
@@ -127,13 +148,21 @@ try {
             $template->assign('daysLabel', _("days"));
             $template->assign('hoursLabel', _("hours"));
             $template->assign('minutesLabel', _("minutes"));
-            $template->assign('defaultStart', date('Y/m/d'));
-            $template->assign('defaultHourStart', date('H'));
-            $template->assign('defaultMinuteStart', date('i'));
-            $endTime = time() + 7200;
-            $template->assign('defaultEnd', date('Y/m/d', $endTime));
-            $template->assign('defaultHourEnd', date('H', $endTime));
-            $template->assign('defaultMinuteEnd', date('i', $endTime));
+
+            list($year, $month, $day) = explode('/', $dateStart);
+            $template->assign('defaultStart', $dateStart);
+
+            $template->assign('defaultHourStart', $hourStart);
+            $template->assign('defaultMinuteStart', $minStart);
+
+            $dateEnd = $dateTime->add(new DateInterval('PT2H'));
+
+            list($year, $month, $day) = explode('/', $dateEnd->format('Y/m/d'));
+            $template->assign('defaultEnd', $dateEnd->format('Y/m/d'));
+
+            list($hour, $minute) = explode(':', $dateEnd->format('H:i'));
+            $template->assign('defaultHourEnd', $hour);
+            $template->assign('defaultMinuteEnd', $minute);
 
             /* default downtime options */
             $fixed_checked = '';
