@@ -51,7 +51,6 @@ require_once $centreon_path . 'www/widgets/host-monitoring/class/centreonWidgetH
 session_start();
 
 try {
-    var_dump($_POST['cmdType']);
     if (!isset($_SESSION['centreon']) || !isset($_POST['cmdType']) || !isset($_POST['hosts']) ||
         !isset($_POST['author'])) {
         throw new Exception('Missing data');
@@ -91,28 +90,50 @@ try {
         $persistent = 0;
         $sticky = 0;
         $notify = 0;
-        if (isset($_POST['persistent'])) {
-            $persistent = 1;
-        }
         if (isset($_POST['sticky'])) {
             $sticky = 1;
         }
         if (isset($_POST['notify'])) {
             $notify = 1;
         }
+        if (isset($_POST['persistent'])) {
+            $persistent = 1;
+        }
 
         foreach ($hosts as $hostId) {
             $hostname = $hostObj->getHostName($hostId);
             $pollerId = $hostObj->getHostPollerId($hostId);
 
-            $commands[$pollerId][] = "ACKNOWLEDGE_HOST_PROBLEM;$hostname;$sticky;$notify;$persistent;$author;$comment";
-            $commands[$pollerId][] = "ACKNOWLEDGE_SVC_PROBLEM;$hostname;$sticky;$notify;$persistent;$author;$comment";
+            /*
+             TODO Add checkbox to use host timezone
 
-            if (isset($_POST['forcecheck'])) {
-                $commands[$pollerId][] = "SCHEDULE_FORCED_HOST_CHECK;$hostname;".time();
-                $commands[$pollerId][] = "SCHEDULE_FORCED_SVC_CHECK;$hostname;".time();
+              $timestampStart = $widgetExternalCommand->getTimestamp($hostId, $dateStart, $timeStart);
+
+              $timestampEnd = $widgetExternalCommand->getTimestamp($hostId, $dateEnd, $timeEnd);
+            */
+
+            $commands[$pollerId][] = "SCHEDULE_HOST_DOWNTIME;$hostname;$timestampStart;$timestampEnd;$fixed;0;$author;$comment";
+
+            if (isset($_POST['processServices'])) {
+                var_dump($_POST['processServices']);
+                $commands[$pollerId][] = "SCHEDULE_HOST_SVC_DOWNTIME;$hostname;$timestampStart;$timestampEnd;$fixed;0;$author;$comment";
             }
         }
+
+//        foreach ($hosts as $hostId) {
+//            $hostname = $hostObj->getHostName($hostId);
+//            $pollerId = $hostObj->getHostPollerId($hostId);
+//
+//            $commands[$pollerId][] = "ACKNOWLEDGE_HOST_PROBLEM;$hostname;$sticky;$notify;$persistent;$author;$comment";
+//
+//
+//            if (isset($_POST['forcecheck'])) {
+////                $serviceDescription = ;
+//
+//                $commands[$pollerId][] = "ACKNOWLEDGE_SVC_PROBLEM;$hostname;$sticky;$notify;$persistent;$author;$comment";
+//
+//            }
+//        }
 
     } elseif ($type == 'downtime') {
         $fixed = 0;
@@ -152,7 +173,7 @@ try {
         list($year, $month, $day) = explode('/', $dateStart);
         $dateTime->setDate($year, $month, $day);
         $timestampStart = $dateTime->getTimestamp();
-        var_dump($timestampStart);
+
 
         if (isset($_POST['end_time']) && $_POST['end_time']) {
             $timeEnd = str_replace(' ', '', $_POST['end_time']);
@@ -166,24 +187,25 @@ try {
         $dateTime->setDate($year, $month, $day);
         $timestampEnd = $dateTime->getTimestamp();
 
-        foreach ($hosts as $hostId) {
-            $hostname = $hostObj->getHostName($hostId);
-            $pollerId = $hostObj->getHostPollerId($hostId);
-
-            /*
-             TODO Add checkbox to use host timezone
-
-              $timestampStart = $widgetExternalCommand->getTimestamp($hostId, $dateStart, $timeStart);
-
-              $timestampEnd = $widgetExternalCommand->getTimestamp($hostId, $dateEnd, $timeEnd);
-            */
-
-            $commands[$pollerId][] = "SCHEDULE_HOST_DOWNTIME;$hostname;$timestampStart;$timestampEnd;$fixed;0;$duration;$author;$comment";
-
-            if (isset($_POST['processServices'])) {
-                $commands[$pollerId][] = "SCHEDULE_HOST_SVC_DOWNTIME;$hostname;$timestampStart;$timestampEnd;$fixed;0;$duration;$author;$comment";
-            }
-        }
+//        foreach ($hosts as $hostId) {
+//            $hostname = $hostObj->getHostName($hostId);
+//            $pollerId = $hostObj->getHostPollerId($hostId);
+//
+//            /*
+//             TODO Add checkbox to use host timezone
+//
+//              $timestampStart = $widgetExternalCommand->getTimestamp($hostId, $dateStart, $timeStart);
+//
+//              $timestampEnd = $widgetExternalCommand->getTimestamp($hostId, $dateEnd, $timeEnd);
+//            */
+//
+//            $commands[$pollerId][] = "SCHEDULE_HOST_DOWNTIME;$hostname;$timestampStart;$timestampEnd;$fixed;0;$duration;$author;$comment";
+//
+//            if (isset($_POST['processServices'])) {
+//                var_dump($_POST['processServices']);
+//                $commands[$pollerId][] = "SCHEDULE_HOST_SVC_DOWNTIME;$hostname;$timestampStart;$timestampEnd;$fixed;0;$duration;$author;$comment";
+//            }
+//        }
 
     } else {
         throw new Exception('Unknown command');
