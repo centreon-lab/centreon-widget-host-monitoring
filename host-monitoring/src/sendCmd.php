@@ -51,10 +51,10 @@ require_once $centreon_path . 'www/widgets/host-monitoring/class/centreonWidgetH
 session_start();
 
 try {
-    if (!isset($_SESSION['centreon']) || !isset($_POST['cmdType']) || !isset($_POST['hosts']) ||
-        !isset($_POST['author'])) {
+    if (!isset($_SESSION['centreon']) || !isset($_POST['cmdType']) || !isset($_POST['hosts']) || !isset($_POST['author'])) {
         throw new Exception('Missing data');
     }
+
     $db = new CentreonDB();
     if (CentreonSession::checkSession(session_id(), $db) == 0) {
         throw new Exception('Invalid session');
@@ -62,6 +62,7 @@ try {
     $type = $_POST['cmdType'];
     $centreon = $_SESSION['centreon'];
     $hosts = explode(',', $_POST['hosts']);
+    $services = explode(',', $_POST['services']);
     $oreon = $centreon;
     $externalCmd = new CentreonExternalCommand($centreon);
     $hostObj = new CentreonHost($db);
@@ -102,7 +103,7 @@ try {
 
         foreach ($hosts as $hostId) {
             $hostname = $hostObj->getHostName($hostId);
-            $pollerId = $hostObj->getHostPollerId($hostId);
+            $pollerId = $hostObj->getHostId($hostId);
 
             /*
              TODO Add checkbox to use host timezone
@@ -112,12 +113,24 @@ try {
               $timestampEnd = $widgetExternalCommand->getTimestamp($hostId, $dateEnd, $timeEnd);
             */
 
-            $commands[$pollerId][] = "SCHEDULE_HOST_DOWNTIME;$hostname;$timestampStart;$timestampEnd;$fixed;0;$author;$comment";
+            $commands[$pollerId][] = "ACKNOWLEDGE_HOST_PROBLEM;$hostname;$sticky;$notify;$persistent;$author;$comment";
+        }
+
+        foreach ($services as $servicesId){
+//            $hostname = $hostObj->getHostName($servicesId);
+//            $servicename = $svcObj->getServiceName($servicesId);
+//            $pollerId = $hostObj->getHostId($servicesId);
+//            //Chopper Id des services
+//            $svcId = $svcObj->getServiceId($servicesId);
+            $hostname = $hostObj->getHostName($hostId);
+            $pollerId = $hostObj->getHostId($hostId);
+            $servicename = $svcObj->getServiceName($servicesId);
+            $pollerId = $svcObj->getServiceId($servicesId);
 
             if (isset($_POST['processServices'])) {
-                var_dump($_POST['processServices']);
-                $commands[$pollerId][] = "SCHEDULE_HOST_SVC_DOWNTIME;$hostname;$timestampStart;$timestampEnd;$fixed;0;$author;$comment";
+                $commands[$pollerId][] = "ACKNOWLEDGE_SVC_PROBLEM;$hostname;$servicename;$sticky;$notify;$persistent;$author;$comment";
             }
+
         }
 
 //        foreach ($hosts as $hostId) {

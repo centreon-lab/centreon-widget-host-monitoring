@@ -112,6 +112,7 @@ $query = "SELECT SQL_CALC_FOUND_ROWS h.host_id,
 $query .= "FROM hosts h ";
 $query .= " LEFT JOIN `customvariables` cv ON (cv.host_id = h.host_id AND cv.service_id IS NULL AND cv.name = 'CRITICALITY_LEVEL') ";
 $query .= " LEFT JOIN `customvariables` cv2 ON (cv2.host_id = h.host_id AND cv2.service_id IS NULL AND cv2.name = 'CRITICALITY_ID') ";
+
 $query .= " WHERE enabled = 1 ";
 $query .= " AND h.name NOT LIKE '_Module_%' ";
 
@@ -123,31 +124,6 @@ if (isset($preferences["display_severities"]) && $preferences["display_severitie
     && isset($preferences['criticities_filter_host']) && $preferences['criticities_filter_host'] != "") {
     $query .= " AND cv2.`value` IN ($preferences[criticities_filter_host]) ";
 }
-//echo $query;
-//var_dump($preferences['criticities_filter_host']);
-
-
-//if (isset($preferences["display_severities"]) && $preferences["display_severities"]
-//    && isset($preferences['criticality_filter']) && $preferences['criticality_filter'] != "") {
-//  $tab = split(",", $preferences['criticality_filter']);
-//  $labels = "";
-//  foreach ($tab as $p) {
-//    if ($labels != '') {
-//      $labels .= ',';
-//    }
-//    $labels .= "'".trim($p)."'";
-//  }
-//  $query2 = "SELECT hc_id FROM hostcategories WHERE hc_name IN (".$labels.")";
-//  $RES = $db->query($query2);
-//  $idC = "";
-//  while ($d1 = $RES->fetchRow()) {
-//    if ($idC != '') {
-//      $idC .= ",";
-//    }
-//    $idC .= $d1['hc_id'];
-//  }
-//  $query .= " AND cv2.`value` IN ($idC) ";
-//}
 
 if (isset($preferences['host_name_search']) && $preferences['host_name_search'] != "") {
     $query .= " AND h.host_id IN ($preferences[host_name_search])";
