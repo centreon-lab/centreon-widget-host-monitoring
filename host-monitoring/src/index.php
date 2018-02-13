@@ -68,7 +68,7 @@ $template = new Smarty();
 $template = initSmartyTplForPopup($path, $template, "./", $centreon_path);
 
 $centreon = $_SESSION['centreon'];
-$centreonWebPath = trim($centreon->optGen['oreon_web_path'], "/");
+$centreonWebPath = rtrim($centreon->optGen['oreon_web_path'], "/");
 $widgetId = $_REQUEST['widgetId'];
 $page = $_REQUEST['page'];
 
@@ -248,7 +248,7 @@ while ($row = $res->fetchRow()) {
             $value = substr($value, 0, $outputLength);
         } elseif (($key == "action_url" || $key == "notes_url") && !empty($value)) {
             if (preg_match('#^\./(.+)#', $value, $matches)) {
-                $value = '/' . $centreonWebPath . '/' . $matches[1];
+                $value = $centreonWebPath . "/" . $matches[1];
             } elseif (!preg_match("#(^http[s]?)|(^//)#", $value)) {
                 $value = '//' . $value;
             }
