@@ -45,6 +45,10 @@ require_once $centreon_path . 'www/class/centreonExternalCommand.class.php';
 
 session_start();
 
+//TODO
+$serverIsRemote = true;
+$disabledCommandsForRemote = [82, 83, 92, 93];
+
 try {
     if (!isset($_SESSION['centreon']) || !isset($_REQUEST['cmd']) || !isset($_REQUEST['selection'])) {
         throw new Exception('Missing data');
@@ -184,6 +188,11 @@ try {
                     throw new Exception('Unknown command');
                     break;
         }
+
+        if ($serverIsRemote && in_array($cmd, $disabledCommandsForRemote)) {
+            $command = '';
+        }
+
         if ($command != "") {
             $externalCommandMethod = 'set_process_command';
             if (method_exists($externalCmd, 'setProcessCommand')) {

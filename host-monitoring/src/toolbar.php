@@ -57,6 +57,8 @@ $db = new CentreonDB();
 $widgetObj = new CentreonWidget($centreon, $db);
 $preferences = $widgetObj->getWidgetPreferences($widgetId);
 
+//TODO
+$serverIsMaster = false;
 $admin = $centreon->user->admin;
 $canDoAction = false;
 if ($admin) {
@@ -72,11 +74,11 @@ if ($canDoAction || $centreon->user->access->checkAction("host_disacknowledgemen
 if ($canDoAction || $centreon->user->access->checkAction("host_schedule_downtime")) {
     $actions .= "<option value='75'>"._("Set Downtime")."</option>";
 }
-if ($canDoAction || $centreon->user->access->checkAction("host_notifications")) {
+if ($serverIsMaster && ($canDoAction || $centreon->user->access->checkAction("host_notifications"))) {
     $actions .= "<option value='82'>"._("Enable Host Notification")."</option>";
     $actions .= "<option value='83'>"._("Disable Host Notification")."</option>";
 }
-if ($canDoAction || $centreon->user->access->checkAction("host_checks")) {
+if ($serverIsMaster && ($canDoAction || $centreon->user->access->checkAction("host_checks"))) {
     $actions .= "<option value='92'>"._("Enable Host Check")."</option>";
     $actions .= "<option value='93'>"._("Disable Host Check")."</option>";
 }
